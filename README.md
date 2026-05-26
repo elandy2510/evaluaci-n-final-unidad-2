@@ -1,0 +1,1 @@
+la pagina se muestra com un interfaz simple un formulario que trata sobre agregar datos juegos a rellenando campos de un formulario donde se insertan datos como el nombre del juego , el precio y su categoria de juego como ya se aun rpg, shooter y asi, estos al guardarse se mostrara en la biblioteca ya guardado
