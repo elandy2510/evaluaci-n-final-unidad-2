@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestor de Juegos Steam</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background-color: #1b2838; color: white; }
+        .container { max-width: 600px; margin: auto; background-color: #2a475e; padding: 20px; border-radius: 8px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; }
+        input { width: 100%; padding: 8px; box-sizing: border-box; }
+        button { padding: 10px 15px; background-color: #66c0f4; color: black; border: none; font-weight: bold; cursor: pointer; }
+        button:hover { background-color: #4199c6; }
+        .game-list { margin-top: 30px; }
+        .game-item { background-color: #171a21; padding: 10px; margin-bottom: 10px; border-left: 4px solid #66c0f4; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Añadir Juego de Steam</h2>
+        
+        <form id="formulario-juego">
+            <div class="form-group">
+                <label for="titulo">Título del Juego:</label>
+                <input type="text" id="titulo" required>
+            </div>
+            <div class="form-group">
+                <label for="genero">Género:</label>
+                <input type="text" id="genero" required>
+            </div>
+            <div class="form-group">
+                <label for="precio">Precio ($):</label>
+                <input type="number" id="precio" required>
+            </div>
+            <button type="submit">Guardar Juego</button>
+        </form>
+
+        <div class="game-list">
+            <h2>Mi Biblioteca de Juegos</h2>
+            <div id="lista-juegos">
+                </div>
+        </div>
+    </div>
+
+    <script>
+        // URL
+        const API_URL = 'http://localhost:3000/api/juegos';
+
+        
+        async function cargarJuegos() {
+            try {
+                const respuesta = await fetch(API_URL);
+                const juegos = await respuesta.json();
+                
+                const contenedor = document.getElementById('lista-juegos');
+                contenedor.innerHTML = ''; // se limpia antes de actualizar
+
+                juegos.forEach(juego => {
+                    const div = document.createElement('div');
+                    div.className = 'game-item';
+                    div.innerHTML = `<strong>${juego.titulo}</strong> - ${juego.genero} ($${juego.precio})`;
+                    contenedor.appendChild(div);
+                });
+            } catch (error) {
+                console.error('Error al cargar la API:', error);
+            }
+        }
+
+        // fucion para enviar formulario
+        document.getElementById('formulario-juego').addEventListener('submit', async (e) => {
+            e.preventDefault(); // no reinicia la pagina
+
+            // se guardan los datos del formulario
+            const nuevoJuego = {
+                titulo: document.getElementById('titulo').value,
+                genero: document.getElementById('genero').value,
+                precio: document.getElementById('precio').value
+            };
+
+            try {
+                // Envia los datos
+                const respuesta = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(nuevoJuego)
+                });
+
+                if (respuesta.status === 201) {
+                    alert('¡Juego agregado con éxito a la biblioteca!');
+                    document.getElementById('formulario-juego').reset(); // Limpia el formulario
+                    cargarJuegos(); // recargar lista
+                } else {
+                    alert('Hubo un error al guardar los datos.');
+                }
+            } catch (error) {
+                console.error('Error en el POST:', error);
+            }
+        });
+
+        // cargar juegos
+        cargarJuegos();
+    </script>
+</body>
+</html>
